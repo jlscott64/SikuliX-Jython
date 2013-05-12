@@ -69,42 +69,42 @@ def uni(s):
 #  2. bundle path
 #
 def load(jar):
-   def _load(abspath):
-      if os.path.exists(abspath):
-         if not abspath in sys.path:
-            sys.path.append(abspath)
-         return True
-      return False
+    def _load(abspath):
+        if os.path.exists(abspath):
+            if not abspath in sys.path:
+                sys.path.append(abspath)
+            return True
+        return False
    
-   if _load(jar):
-      return True
-   path = getBundlePath()
-   if path:
-      jarInBundle = os.path.join(path, jar)
-      if _load(jarInBundle):
-         return True
-   path = ExtensionManager.getInstance().getLoadPath(jar)
-   if path and _load(path):
-      return True
-   return False
+    if _load(jar):
+        return True
+    path = getBundlePath()
+    if path:
+        jarInBundle = os.path.join(path, jar)
+        if _load(jarInBundle):
+            return True
+    path = ExtensionManager.getInstance().getLoadPath(jar)
+    if path and _load(path):
+        return True
+    return False
 
 def addModPath(path):
-   if path[-1] == Settings.getFilePathSeperator():
-      path = path[:-1]
-   if not path in sys.path:
-      sys.path.append(path)
+    if path[-1] == Settings.getFilePathSeperator():
+        path = path[:-1]
+    if not path in sys.path:
+        sys.path.append(path)
 
 def addImagePath(path):
-   ImageLocator.addImagePath(path)
+    ImageLocator.addImagePath(path)
 
 def getImagePath():
-   return [e for e in ImageLocator.getImagePath() if e]
+    return [e for e in ImageLocator.getImagePath() if e]
 
 def removeImagePath(path):
-   ImageLocator.removeImagePath(path)
+    ImageLocator.removeImagePath(path)
    
 def resetImagePath(path):
-   ImageLocator.resetImagePath(path)
+    ImageLocator.resetImagePath(path)
 
 ##
 # Sets the path for searching images in all Sikuli Script methods. <br/>
@@ -113,17 +113,17 @@ def resetImagePath(path):
 # not call this method.
 #
 def setBundlePath(path):
-   ImageLocator.setBundlePath(path)
+    ImageLocator.setBundlePath(path)
 
 def getBundlePath():
-   return ImageLocator.getBundlePath()
+    return ImageLocator.getBundlePath()
 
 ##
 # Sikuli shows actions (click, dragDrop, ... etc.) if this flag is set to <i>True</i>.
 # The default setting is <i>False</i>.
 #
 def setShowActions(flag):
-   SikuliScript.setShowActions(flag)
+    SikuliScript.setShowActions(flag)
 
 ##
 # Shows a question-message dialog requesting input from the user.
@@ -132,40 +132,40 @@ def setShowActions(flag):
 # @return The user's input string.
 #
 def input(msg="", default=""):
-   return SikuliScript.input(msg, default)
+    return SikuliScript.input(msg, default)
 
 def capture(*args):
-   scr = ScreenUnion()
-   if len(args) == 0:
-      simg = scr.userCapture()
-      if simg:
-         return simg.getFilename()
-      else:
-         return None
-   elif len(args) == 1:
-      if __builtin__.type(args[0]) is types.StringType or __builtin__.type(args[0]) is types.UnicodeType:
-         simg = scr.userCapture(args[0])
-         if simg:
+    scr = ScreenUnion()
+    if len(args) == 0:
+        simg = scr.userCapture()
+        if simg:
             return simg.getFilename()
-         else:
+        else:
             return None
-      else:
-         return scr.capture(args[0]).getFilename()
-   elif len(args) == 4:
-      return scr.capture(args[0], args[1], args[2], args[3]).getFilename()
-   else:
-      return None
+    elif len(args) == 1:
+        if __builtin__.type(args[0]) is types.StringType or __builtin__.type(args[0]) is types.UnicodeType:
+            simg = scr.userCapture(args[0])
+            if simg:
+                return simg.getFilename()
+            else:
+                return None
+        else:
+            return scr.capture(args[0]).getFilename()
+    elif len(args) == 4:
+        return scr.capture(args[0], args[1], args[2], args[3]).getFilename()
+    else:
+        return None
 
 
 def selectRegion(msg=None):
-   if msg:
-      r = ScreenUnion().selectRegion(msg)
-   else:
-      r = ScreenUnion().selectRegion()
-   if r:
-      return Region(r)
-   else:
-      return None
+    if msg:
+        r = ScreenUnion().selectRegion(msg)
+    else:
+        r = ScreenUnion().selectRegion()
+    if r:
+        return Region(r)
+    else:
+        return None
 
 
 ##
@@ -177,37 +177,37 @@ def selectRegion(msg=None):
 # @param app The name of the application. (case-insensitive)
 #
 def switchApp(app):
-   return SikuliScript.switchApp(app)
+    return SikuliScript.switchApp(app)
 
 ##
 # Opens the given application. <br/>
 # @param app The name of an application if it is in the environment variable PATH, or the full path to an application.
 #
 def openApp(app):
-   return SikuliScript.openApp(app)
+    return SikuliScript.openApp(app)
 
 ##
 # Closes the given application. <br/>
 # @param app The name of the application. (case-insensitive)
 #
 def closeApp(app):
-   return SikuliScript.closeApp(app)
+    return SikuliScript.closeApp(app)
 
 ##
 # Sleeps until the given amount of time in seconds has elapsed.
 # @param sec The amount of sleeping time in seconds.
 def sleep(sec):
-   time.sleep(sec)
+    time.sleep(sec)
 
 ##
 # Shows a message dialog containing the given message.
 # @param msg The given message string.
 def popup(msg, title="Sikuli"):
-   SikuliScript.popup(msg, title)
+    SikuliScript.popup(msg, title)
 
 def exit(code=0):
-   ScreenHighlighter.closeAll()
-   sys.exit(code)
+    ScreenHighlighter.closeAll()
+    sys.exit(code)
 
 ##
 # Runs the given string command.
@@ -219,15 +219,15 @@ def run(cmd):
 ##
 # display some help in interactive mode
 def shelp():
-   SikuliScript.shelp()
+    SikuliScript.shelp()
 
 ############### SECRET FUNCTIONS ################
 
 def initSikuli():
-   dict = globals()
-   dict['METHODCATALOG'] = sys.modules[__name__].__dict__
-   dict['SCREEN'] = Screen()
-   dict['SCREEN']._exposeAllMethods(__name__)
+    dict = globals()
+    dict['METHODCATALOG'] = sys.modules[__name__].__dict__
+    dict['SCREEN'] = Screen()
+    dict['SCREEN']._exposeAllMethods(__name__)
 
 
 initSikuli()
