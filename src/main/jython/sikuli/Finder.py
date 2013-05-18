@@ -16,8 +16,8 @@ class Finder(JFinder):
     def __enter__(self):
         return super
     
-    def __exit__(type, value, trackback):
+    def __exit__(self, type, value, trackback):
         super.destroy()
     
-    def __del__(type, value, trackback):
+    def __del__(self, type, value, trackback):
         super.destroy()

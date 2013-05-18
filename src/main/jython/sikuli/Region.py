@@ -3,35 +3,16 @@
 # modified RaiMan 2012
 
 from org.sikuli.script import Region as JRegion
-from org.sikuli.script import Location
-from org.sikuli.script import Settings
 from org.sikuli.script import SikuliEventAdapter
-from Constants import *
+from Constants import FOREVER
 import sys
 import inspect
-import types
-import time
-import java.lang.String
-import __main__
-import __builtin__
 
 DEBUG=False
 
 class Region(JRegion):
-
-    def __init__(self, *args):
-        if DEBUG: print "**IN*** Jython INIT Region"
-        if len(args)==4:
-           JRegion.__init__(self, args[0], args[1], args[2], args[3])
-        elif len(args)==1:
-           JRegion.__init__(self, args[0])
-        else:
-           raise Exception("Wrong number of parameters of Region's contructor")
-        self.setScriptingType("JythonRegion")
-        self._global_funcs = None
-        if DEBUG: print "**OUT** Jython INIT Region"
-
-########################## support for with:
+    
+    # support for with:
     # override all global sikuli functions by this region's methods.
     def __enter__(self):
         exclude_list = [ 'ROI' ]
@@ -61,44 +42,25 @@ class Region(JRegion):
                 print "with restore: %s"%(str(dict[name])[1:])
         self._global_funcs = None
 
-########################## helper to check with
-    def checkWith(self):
-        print "checkWith: from: ", self
-
 #######################################################################
 #---- SIKULI  PUBLIC  API
 #######################################################################
 
-########################## Python wait() needs to be here because Java Object has a final method: wait(long timeout).
+# Python wait() needs to be here because Java Object has a final method: wait(long timeout).
 # If we want to let Sikuli users use wait(int/long timeout), we need this Python method.
-# FIXME: default timeout should be autoWaitTimeout
     def wait(self, target, timeout=None):
-        if isinstance(target, int) or isinstance(target, long) or isinstance(target, float):
-            time.sleep(target)
-            return
+        if isinstance(target, int) or isinstance(target, long):
+            target = float(target)
         if timeout == None:
-            ret = JRegion.wait(self, target)
+            return JRegion.wait(self, target)
         else:
-            ret = JRegion.wait(self, target, timeout)
-        return ret
+            return JRegion.wait(self, target, timeout)
 
-########################## Python paste() needs to be here because of encoding conversion
-    def paste(self, *args):
-        if len(args) == 1:
-            target = None
-            s = args[0]
-        elif len(args) == 2:
-            target = args[0]
-            s = args[1]
-        if isinstance(s, types.StringType):
-            s = java.lang.String(s, "utf-8")
-        return JRegion.paste(self, target, s)
-
-######################### the new Region.text() feature (Tesseract 3) returns utf8
+# the new Region.text() feature (Tesseract 3) returns utf8
     def text(self):
         return JRegion.text(self).encode("utf8")
 
-########################## observe(): Special setup for Jython
+# observe(): Special setup for Jython
     def onAppear(self, target, handler):
         class AnonyObserver(SikuliEventAdapter):
             def targetAppeared(self, event):
@@ -112,23 +74,26 @@ class Region(JRegion):
         return JRegion.onVanish(self, target, AnonyObserver())
 
     def onChange(self, arg1, arg2=None):
-        t_arg1 = __builtin__.type(arg1)
-        if t_arg1 is types.IntType:
+
+        if isinstance(arg1, int):
             min_size = arg1
             handler = arg2
         else:
-            assert t2 == None, "onChange: wrong arguments"
+            if (arg2 != None):
+                raise Exception("onChange: Invalid parameters set")
             min_size = None
             handler = arg1
+        
         class AnonyObserver(SikuliEventAdapter):
             def targetChanged(self, event):
                 handler(event)
+                
         if min_size != None:
             return JRegion.onChange(self, min_size, AnonyObserver())
         return JRegion.onChange(self, AnonyObserver())
     
     def observe(self, time=FOREVER, background=False):
         if background:
-            return self.observeInBackground(time)
+            return JRegion.observeInBackground(self, time)
         else:
             return JRegion.observe(self, time)
