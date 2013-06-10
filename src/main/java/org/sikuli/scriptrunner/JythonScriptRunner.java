@@ -8,8 +8,8 @@ package org.sikuli.scriptrunner;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
-
 import org.apache.commons.cli.CommandLine;
 import org.python.util.PythonInterpreter;
 import org.python.util.jython;
@@ -161,12 +161,11 @@ public class JythonScriptRunner implements IScriptRunner {
      * @return The exitcode
      */
     private int runPython(File pyFile, File imagePath, String[] argv) {
-
         fillSysArgv(pyFile, argv);
         createPythonInterpreter();
         executeScriptHeader(new String[] {
                 pyFile.getParentFile().getAbsolutePath(),
-                imagePath.getAbsolutePath()
+                (imagePath == null ? null : imagePath.getAbsolutePath())
         });
 
         int exitCode = 0;
@@ -193,17 +192,12 @@ public class JythonScriptRunner implements IScriptRunner {
      * @param argv The parameters passed to Sikuli with --args
      */
     private void fillSysArgv(File pyFile, String[] argv) {
+        sysargv = new ArrayList<String>();
         if (pyFile != null) {
-            sysargv = new ArrayList<String>(argv == null ? 1 : argv.length + 1);
             sysargv.add(pyFile.getAbsolutePath());
-        } else {
-            sysargv = new ArrayList<String>(argv == null ? 0 : argv.length);
         }
-
         if (argv != null) {
-            for(String arg : argv) {
-                sysargv.add(arg);
-            }
+          sysargv.addAll(Arrays.asList(argv));
         }
     }
 
