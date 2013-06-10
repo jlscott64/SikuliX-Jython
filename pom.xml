@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.sikuli</groupId>
+    <artifactId>SikuliX-Jython-API</artifactId>
+    <name>SikuliX-Jython-API</name>
+    <url>http://www.sikuli.org</url>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.sikuli.org/LICENSE.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>kelthuzad</id>
+            <name>kelthuzad</name>
+            <email>j_the_k@web.de</email>
+        </developer>
+        <developer>
+            <id>RaiMan</id>
+            <name>RaiMan</name>
+            <email>rmhdevelop@me.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git://github.com/kelthuzad/SikuliX-Jython-API.git</connection>
+        <developerConnection>scm:git:git://github.com/kelthuzad/SikuliX-Jython-API.git</developerConnection>
+        <url>git://github.com/kelthuzad/SikuliX-Jython-API.git</url>
+    </scm>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.python</groupId>
+            <artifactId>jython-standalone</artifactId>
+            <version>2.5.4-rc1</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.sikuli</groupId>
+            <artifactId>SikuliX-API</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Enable this plugin to include execute action (needed for eclipse) -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.codehaus.mojo</groupId>
+                                        <artifactId>aspectj-maven-plugin</artifactId>
+                                        <versionRange>[1.0,)</versionRange>
+                                        <goals>
+                                            <goal>test-compile</goal>
+                                            <goal>compile</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <execute />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <finalName>sikuli-pyapi</finalName>
+
+        <!-- copy jython and native resources -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource> <!-- Jython Resources: Python files -->
+                <directory>src/main/jython/sikuli</directory>
+                <targetPath>Lib/sikuli</targetPath>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <!-- Plugin to create an executable jar and a jar with dependencies included -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.sikuli.script.SikuliScript</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <finalName>sikuli-script-jython</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Plugin to create an executable jar
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.sikuli.script.SikuliScript</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+      -->
+
+      <!-- This plugin is needed to include additional java source directories for compilation 
+      <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+              <artifactId>build-helper-maven-plugin</artifactId>
+              <version>1.8</version>
+              <executions>
+                  <execution>
+                      <id>add-source</id>
+                      <phase>generate-sources</phase>
+                      <goals>
+                          <goal>add-source</goal>
+                      </goals>
+                      <configuration>
+                          <sources>
+                              <source>src/main/jython</source>
+                          </sources>
+                      </configuration>
+                  </execution>
+              </executions>
+            </plugin> -->
+        </plugins>
+    </build>
+</project>

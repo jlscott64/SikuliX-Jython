@@ -1,0 +1,21 @@
+*.class
+
+# Package Files #
+*.jar
+/target
+
+# linux temp files #
+*~
+
+# Eclipse project files #
+.project
+.settings/
+.classpath
+.pydevproject
+
+# output directories #
+/bin
+
+# python runtime stuff #
+/cachedir
+
