@@ -1,10 +1,12 @@
 # Copyright 2010-2011, Sikuli.org
 # Released under the MIT License.
-from org.sikuli.script.compare import *
+from org.sikuli.script.compare import DistanceComparator
+from org.sikuli.script.compare import VerticalComparator
+from org.sikuli.script.compare import HorizontalComparator
 
 def byDistanceTo(m):
     """ Method to compare two Region objects by distance to m. This method is deprecated and should not be used. Use distanceComparator() instead """
-    return distanceComparator(m)
+    return DistanceComparator(m)
 
 def byX(m):
     """ Method to compare two Region objects by x value. This method is deprecated and should not be used. Use horizontalComparator() instead """

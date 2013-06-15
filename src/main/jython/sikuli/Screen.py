@@ -23,16 +23,16 @@ class Screen(Region):
         (x, y, w, h) = (int(r.getX()), int(r.getY()), \
                         int(r.getWidth()), int(r.getHeight()))
         Region.__init__(self, x, y, w, h)
-        self.setScriptingType("JythonScreen")
+        #self.setScriptingType("JythonScreen")
         if DEBUG: print "**OUT** Jython INIT Screen"
-    
+
     @classmethod
     def getNumberScreens(cls):
         return JScreen.getNumberScreens()
-    
+
     def getBounds(self):
         return self.getScreen().getBounds()
-    
+
     def selectRegion(self, msg=None):
         if msg:
             r = self.getScreen().selectRegion(msg)
@@ -42,7 +42,7 @@ class Screen(Region):
             return Region(r)
         else:
             return None
-    
+
     ##
     # Enters the screen-capture mode asking the user to capture a region of
     # the screen if no arguments are given.
@@ -72,7 +72,7 @@ class Screen(Region):
             return scr.capture(args[0], args[1], args[2], args[3]).getFile()
         else:
             return None
-    
+
     def _exposeAllMethods(self, mod):
         exclude_list = [ 'class', 'classDictInit', 'clone', 'equals', 'finalize',
                         'getClass', 'hashCode', 'notify', 'notifyAll',
@@ -91,7 +91,10 @@ class Screen(Region):
                 dict[name] = eval("self."+name)
                 if DEBUG and name == 'checkWith': print name, str(dict[name])[1:]
                 #__main__.__dict__[name] = eval("self."+name)
-    
+
+    def resetROI(self):
+        self.setRect(self.getScreen().getBounds())
+
     def toString(self):
         return self.getScreen().toString()
 
