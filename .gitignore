@@ -19,3 +19,5 @@
 # python runtime stuff #
 /cachedir
 
+nb-configuration.xml
+nbactions.xml
