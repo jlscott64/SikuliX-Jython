@@ -1,12 +1,12 @@
-SikuliX-Jython-API
-==================
+SikuliX-Jython 1.0.1
+====================
 
-The Jython API for the SikuliX-API. 
-This project depends on SikuliX-API and provides a Python interface for the Sikuli API.
+The Jython script runner support for the SikuliX-API. 
+This project depends on SikuliX-API and provides a Python interface for java level API.
 
-SikuliX-Jython-API implements the **IScriptRunner** Interface that is loaded by SikuliX-API with the Java ServiceLoader. 
+SikuliX-Jython implements the **IScriptRunner** interface that is loaded by SikuliX-API, when you run Sikuli scripts written in Python language.
 
-Use **mvn install** with the SikuliX-API artifact in your maven repository to create two jars:<br>
+Use **mvn install** with the SikuliX-API artifact in your maven repository to create sikuli-jython.jar
+which contains the the latest jython (currently 2.5.4rc1) and the package Lib/sikuli (for: from sikuli import *).
 
-- sikuli-pyapi.jar contains only this project's compiled java files and the python files. You have to manage all dependencies yourself to run this jar.
-- sikuli-script-jython.jar contains the dependencies jython.2.5.4 standalone and SikuliX-API and can run without any external dependencies.
+This jar is not executable (use sikuli-script.jar from the SikuliX-API package).
