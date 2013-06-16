@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.sikuli</groupId>
-    <artifactId>SikuliX-Jython-API</artifactId>
-    <name>SikuliX-Jython-API</name>
+    <artifactId>SikuliX-Jython</artifactId>
+    <name>SikuliX-Jython</name>
     <url>http://www.sikuli.org</url>
-    <version>1.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -32,9 +32,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git://github.com/kelthuzad/SikuliX-Jython-API.git</connection>
-        <developerConnection>scm:git:git://github.com/kelthuzad/SikuliX-Jython-API.git</developerConnection>
-        <url>git://github.com/kelthuzad/SikuliX-Jython-API.git</url>
+        <connection>scm:git://github.com/RaiMan/SikuliX-Jython.git</connection>
+        <developerConnection>scm:git://github.com/RaiMan/SikuliX-Jython.git</developerConnection>
+        <url>git://github.com/RaiMan/SikuliX-Jython.git</url>
     </scm>
 
     <properties>
@@ -47,18 +47,18 @@
             <artifactId>jython-standalone</artifactId>
             <version>2.5.4-rc1</version>
         </dependency>
-        
-        <dependency>
+
+       <dependency>
             <groupId>org.sikuli</groupId>
             <artifactId>SikuliX-API</artifactId>
-            <version>1.0</version>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 
     <build>
+        <!-- Enable this plugin to include execute action (needed for eclipse)
         <pluginManagement>
             <plugins>
-                <!-- Enable this plugin to include execute action (needed for eclipse) -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
@@ -86,16 +86,17 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        -->
 
-        <finalName>sikuli-pyapi</finalName>
+        <finalName>sikuli-jython</finalName>
 
         <!-- copy jython and native resources -->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
-            <resource> <!-- Jython Resources: Python files -->
-                <directory>src/main/jython/sikuli</directory>
+            <resource>
+                <directory>src/main/resources-jython-sikuli/sikuli</directory>
                 <targetPath>Lib/sikuli</targetPath>
             </resource>
         </resources>
@@ -110,68 +111,6 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-            <!-- Plugin to create an executable jar and a jar with dependencies included -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.sikuli.script.SikuliScript</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <finalName>sikuli-script-jython</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Plugin to create an executable jar
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.sikuli.script.SikuliScript</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-      -->
-
-      <!-- This plugin is needed to include additional java source directories for compilation 
-      <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-              <artifactId>build-helper-maven-plugin</artifactId>
-              <version>1.8</version>
-              <executions>
-                  <execution>
-                      <id>add-source</id>
-                      <phase>generate-sources</phase>
-                      <goals>
-                          <goal>add-source</goal>
-                      </goals>
-                      <configuration>
-                          <sources>
-                              <source>src/main/jython</source>
-                          </sources>
-                      </configuration>
-                  </execution>
-              </executions>
-            </plugin> -->
         </plugins>
     </build>
 </project>
