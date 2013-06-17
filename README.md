@@ -2,7 +2,7 @@ SikuliX-Jython 1.0.1
 ====================
 
 This is **fully Maven**, so a fork of this repo can be directly used as project in NetBeans/Eclipse/...<br />
-or using the mvn commandline access. Currently, it needs a valid SikuliX-API in your local Maven repo.
+or using mvn on commandline. Currently it needs a valid SikuliX-API in your local Maven repo.
 
 It supplies the Jython script runner support for the SikuliX-API.<br />
 This project depends on SikuliX-API and provides a Python interface for the java level API to beused 
