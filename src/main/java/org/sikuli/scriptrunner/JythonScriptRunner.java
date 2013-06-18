@@ -7,6 +7,7 @@
 package org.sikuli.scriptrunner;
 
 import java.io.File;
+import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -16,7 +17,6 @@ import org.python.util.PythonInterpreter;
 import org.python.util.jython;
 import org.sikuli.script.Debug;
 import org.sikuli.script.IScriptRunner;
-import org.sikuli.script.ScreenHighlighter;
 
 /**
  * Executes Sikuliscripts written in Python/Jython.
@@ -49,7 +49,6 @@ public class JythonScriptRunner implements IScriptRunner {
    * CommandLine args
    */
   CommandLine cmdLine = null;
-
   private int errorLine;
   private int errorColumn;
   private String errorType;
@@ -69,7 +68,12 @@ public class JythonScriptRunner implements IScriptRunner {
    */
   @Override
   public void init(String[] param) {
-    // Nothing todo
+    //HACK: to let it work with IDE runs too (no jar present)
+    CodeSource src = JythonScriptRunner.class.getProtectionDomain().getCodeSource();
+    if (src != null && !src.getLocation().getPath().endsWith(".jar")) {
+      String pyLib = new File(src.getLocation().getPath(), "Lib").getAbsolutePath();
+      System.setProperty("python.path", pyLib);
+    }
   }
 
   /**
@@ -104,7 +108,7 @@ public class JythonScriptRunner implements IScriptRunner {
         //Debug.error(_I("msgStopped"));
         exitCode = findErrorSource(e, pyFile.getAbsolutePath(), forIDE);
         if (forIDE != null) {
-            exitCode *= -1;
+          exitCode *= -1;
         } else {
           exitCode = 1;
         }
@@ -352,7 +356,6 @@ public class JythonScriptRunner implements IScriptRunner {
     if (interpreter != null) {
       interpreter.cleanup();
     }
-    ScreenHighlighter.closeAll();
   }
 
   /**

@@ -88,24 +88,46 @@
         </pluginManagement>
         -->
 
-        <finalName>sikuli-jython</finalName>
+        <finalName>sikulix-jython</finalName>
 
-        <!-- copy jython and native resources -->
+        <!-- copy jython standalone content
         <resources>
             <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources-jython-sikuli/sikuli</directory>
-                <targetPath>Lib/sikuli</targetPath>
+                <directory>src/main/resources-jython/</directory>
             </resource>
         </resources>
-
+-->
         <plugins>
+
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>org.sikuli.script.SikuliScript</mainClass>
+            </manifest>
+          </archive>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <finalName>sikuli-script</finalName>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.1</version>
+                <version>3.1</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
