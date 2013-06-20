@@ -7,6 +7,10 @@
 package org.sikuli.scriptrunner;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream;
 import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +20,7 @@ import org.apache.commons.cli.CommandLine;
 import org.python.util.PythonInterpreter;
 import org.python.util.jython;
 import org.sikuli.script.Debug;
+import org.sikuli.script.FileManager;
 import org.sikuli.script.IScriptRunner;
 
 /**
@@ -23,6 +28,7 @@ import org.sikuli.script.IScriptRunner;
  */
 public class JythonScriptRunner implements IScriptRunner {
 
+  private static final String me = "JythonScriptRunner";
   /**
    * The PythonInterpreter instance
    */
@@ -62,6 +68,16 @@ public class JythonScriptRunner implements IScriptRunner {
   private static final String NL = String.format("%n");
   private Pattern pFile = Pattern.compile("File..(.*?\\.py).*?"
           + ",.*?line.*?(\\d+),.*?in(.*?)" + NL + "(.*?)" + NL);
+  //TODO SikuliToHtmlConverter implement in Java
+  final static InputStream SikuliToHtmlConverter =
+          JythonScriptRunner.class.getResourceAsStream("/scripts/sikuli2html.py");
+  static String pyConverter =
+          FileManager.convertStreamToString(SikuliToHtmlConverter);
+  //TODO SikuliBundleCleaner implement in Java
+  final static InputStream SikuliBundleCleaner =
+          JythonScriptRunner.class.getResourceAsStream("/scripts/clean-dot-sikuli.py");
+  static String pyBundleCleaner =
+          FileManager.convertStreamToString(SikuliBundleCleaner);
 
   /**
    * {@inheritDoc}
@@ -90,9 +106,9 @@ public class JythonScriptRunner implements IScriptRunner {
     fillSysArgv(pyFile, argv);
     createPythonInterpreter();
     executeScriptHeader(new String[]{
-              pyFile.getParentFile().getAbsolutePath(),
-              (imagePath == null ? null : imagePath.getAbsolutePath())
-            });
+      pyFile.getParentFile().getAbsolutePath(),
+      (imagePath == null ? null : imagePath.getAbsolutePath())
+    });
 
     int exitCode = 0;
     try {
@@ -392,23 +408,19 @@ public class JythonScriptRunner implements IScriptRunner {
     return interpreter;
   }
 
-  /**
-   * Executes the defined header for the jython script.
-   *
-   * @param syspaths List of all syspath entries
-   */
-  private void executeScriptHeader(String[] syspaths) {
-    for (String line : SCRIPT_HEADER) {
-      Debug.log(5, "PyInit: %s", line);
-      interpreter.exec(line);
-    }
-    for (String syspath : syspaths) {
-      interpreter.exec("addModPath(\"" + syspath + "\")");
-    }
-    if (codeBefore != null) {
-      for (String line : codeBefore) {
-        interpreter.exec(line);
-      }
+  @Override
+  public boolean doSomethingSpecial(String action, Object[] args) {
+    if ("redirect".equals(action)) {
+      doRedirect((PipedInputStream[]) args);
+      return true;
+    } else if ("convertSrcToHtml".equals(action)) {
+      convertSrcToHtml((String) args[0]);
+      return true;
+    } else if ("cleanBundle".equals(action)) {
+      cleanBundle((String) args[0]);
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -440,5 +452,63 @@ public class JythonScriptRunner implements IScriptRunner {
       codeAfter = new ArrayList<String>();
     }
     codeAfter.addAll(Arrays.asList(stmts));
+  }
+
+  /**
+   * Executes the defined header for the jython script.
+   *
+   * @param syspaths List of all syspath entries
+   */
+  private void executeScriptHeader(String[] syspaths) {
+    for (String line : SCRIPT_HEADER) {
+      Debug.log(5, "PyInit: %s", line);
+      interpreter.exec(line);
+    }
+    for (String syspath : syspaths) {
+      interpreter.exec("addModPath(\"" + syspath + "\")");
+    }
+    if (codeBefore != null) {
+      for (String line : codeBefore) {
+        interpreter.exec(line);
+      }
+    }
+  }
+
+  private boolean doRedirect(PipedInputStream[] pin) {
+    PythonInterpreter py = getPythonInterpreter();
+    try {
+      PipedOutputStream pout = new PipedOutputStream(pin[0]);
+      PrintStream ps = new PrintStream(pout, true);
+      System.setOut(ps);
+      py.setOut(ps);
+    } catch (Exception e) {
+      Debug.log(2, "%s: doRedirect: Couldn't redirect STDOUT\n%s", me, e.getMessage());
+      return false;
+    }
+    try {
+      PipedOutputStream pout = new PipedOutputStream(pin[1]);
+      PrintStream ps = new PrintStream(pout, true);
+      System.setErr(ps);
+      py.setErr(ps);
+    } catch (Exception e) {
+      Debug.log(2, "%s: doRedirect: Couldn't redirect STDERR\n%s", me, e.getMessage());
+      return false;
+    }
+    return true;
+  }
+
+  private void convertSrcToHtml(String bundle) {
+    PythonInterpreter py = new PythonInterpreter();
+    Debug.log(2, "Convert Sikuli source code " + bundle + " to HTML");
+    py.set("local_convert", true);
+    py.set("sikuli_src", bundle);
+    py.exec(pyConverter);
+  }
+
+  private void cleanBundle(String bundle) {
+    PythonInterpreter py = new PythonInterpreter();
+    Debug.log(2, "Clear source bundle " + bundle);
+    py.set("bundle_path", bundle);
+    py.exec(pyBundleCleaner);
   }
 }
