@@ -84,11 +84,16 @@ public class JythonScriptRunner implements IScriptRunner {
    */
   @Override
   public void init(String[] param) {
-    //HACK: to let it work with IDE runs too (no jar present)
-    CodeSource src = JythonScriptRunner.class.getProtectionDomain().getCodeSource();
-    if (src != null && !src.getLocation().getPath().endsWith(".jar")) {
-      String pyLib = new File(src.getLocation().getPath(), "Lib").getAbsolutePath();
-      System.setProperty("python.path", pyLib);
+    //HACK: to let it work with python.path empty
+    if (System.getProperty("python.path") == null) {
+      CodeSource src = JythonScriptRunner.class.getProtectionDomain().getCodeSource();
+      if (src.getLocation() != null) {
+        Debug.log(2, "%s: init: python.path hack: %s", me, src.getLocation().getPath());
+        String pyLib = new File(src.getLocation().getPath(), "Lib").getAbsolutePath();
+        System.setProperty("python.path", pyLib);
+      } else {
+        Debug.error("%s: init: python.path == null: Sikuli might not work", me); 
+      }
     }
   }
 
