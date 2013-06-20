@@ -3,8 +3,7 @@
 # modified RaiMan 2012
 from org.sikuli.script import Screen as JScreen
 import inspect
-#import __main__
-#import __builtin__
+import types
 import sys
 import traceback
 
@@ -60,7 +59,7 @@ class Screen(Region):
             else:
                 return None
         elif len(args) == 1:
-            if __builtin__.type(args[0]) is types.StringType or __builtin__.type(args[0]) is types.UnicodeType:
+            if isinstance(args[0], (types.StringType, types.UnicodeType)):
                 simg = scr.userCapture(args[0])
                 if simg:
                     return simg.getFile()
