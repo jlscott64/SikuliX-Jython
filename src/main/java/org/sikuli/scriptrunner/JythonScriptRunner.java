@@ -43,7 +43,6 @@ public class JythonScriptRunner implements IScriptRunner {
   private static String[] SCRIPT_HEADER = new String[]{
     "# -*- coding: utf-8 -*- ",
     "import sys",
-    "for e in sys.path: print e",
     "from __future__ import with_statement",
     "from sikuli import *",
     "resetROI()",
@@ -92,7 +91,7 @@ public class JythonScriptRunner implements IScriptRunner {
         String pyLib = new File(src.getLocation().getPath(), "Lib").getAbsolutePath();
         System.setProperty("python.path", pyLib);
       } else {
-        Debug.error("%s: init: python.path == null: Sikuli might not work", me); 
+        Debug.error("%s: init: python.path == null: Sikuli might not work", me);
       }
     }
   }
@@ -110,11 +109,13 @@ public class JythonScriptRunner implements IScriptRunner {
 //TODO not useable this way from IDE on rerun
     fillSysArgv(pyFile, argv);
     createPythonInterpreter();
-    executeScriptHeader(new String[]{
-      pyFile.getParentFile().getAbsolutePath(),
-      (imagePath == null ? null : imagePath.getAbsolutePath())
-    });
-
+    try {
+      executeScriptHeader(new String[]{
+        pyFile.getParentFile().getAbsolutePath(),
+        (imagePath == null ? null : imagePath.getAbsolutePath())
+      });
+    } catch (Exception e) {
+    }
     int exitCode = 0;
     try {
       interpreter.execfile(pyFile.getAbsolutePath());
