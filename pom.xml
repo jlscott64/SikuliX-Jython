@@ -43,15 +43,15 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.python</groupId>
-      <artifactId>jython-standalone</artifactId>
-      <version>2.5.4-rc1</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.sikuli</groupId>
       <artifactId>SikuliX-API</artifactId>
       <version>1.0.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython-standalone</artifactId>
+      <version>2.5.4-rc1</version>
     </dependency>
   </dependencies>
 
@@ -90,39 +90,7 @@
 
     <finalName>sikulix-jython</finalName>
 
-    <!-- copy jython standalone content
-            <resources>
-                <resource>
-                    <directory>src/main/resources-jython/</directory>
-                </resource>
-            </resources>
-    -->
     <plugins>
-
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>org.sikuli.script.SikuliScript</mainClass>
-            </manifest>
-          </archive>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <finalName>sikuli-script</finalName>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -133,6 +101,22 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+      
+      <!-- Plugin to create an additional jar containing the source 
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.2.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      -->      
     </plugins>
   </build>
 </project>
