@@ -48,6 +48,7 @@ public class JythonScriptRunner implements IScriptRunner {
     "resetROI()",
     "setShowActions(False)"
   };
+  
   private static ArrayList<String> codeBefore = null;
   private static ArrayList<String> codeAfter = null;
   /**
@@ -110,9 +111,12 @@ public class JythonScriptRunner implements IScriptRunner {
     fillSysArgv(pyFile, argv);
     createPythonInterpreter();
     try {
+      if (imagePath != null) {
+        execBefore(new String[] {"resetImagePath(\"" + imagePath.getAbsolutePath() + "\")"});
+      }
       executeScriptHeader(new String[]{
         pyFile.getParentFile().getAbsolutePath(),
-        (imagePath == null ? null : imagePath.getAbsolutePath())
+        pyFile.getParentFile().getParentFile().getAbsolutePath(),
       });
     } catch (Exception e) {
     }
@@ -136,6 +140,11 @@ public class JythonScriptRunner implements IScriptRunner {
         }
       }
     }
+    Debug.log(2, "%s: at exit: path:", me);
+    for (Object p : interpreter.getSystemState().path.toArray()) {
+      Debug.log(2, p.toString());
+    }
+    Debug.log(2, "%s: at exit: --- end ---", me);
     return exitCode;
   }
 
@@ -156,15 +165,15 @@ public class JythonScriptRunner implements IScriptRunner {
       Pattern pError = Pattern.compile(NL + "(.*?):.(.*)$");
       mFile = pFile.matcher(err);
       if (mFile.find()) {
-        Debug.log(2, "Runtime error line: " + mFile.group(2)
+        Debug.log(4, "Runtime error line: " + mFile.group(2)
                 + "\n in function: " + mFile.group(3)
                 + "\n statement: " + mFile.group(4));
         errorLine = Integer.parseInt(mFile.group(2));
         errorClass = PY_RUNTIME;
         Matcher mError = pError.matcher(err);
         if (mError.find()) {
-          Debug.log(2, "Error:" + mError.group(1));
-          Debug.log(2, "Error:" + mError.group(2));
+          Debug.log(4, "Error:" + mError.group(1));
+          Debug.log(4, "Error:" + mError.group(2));
           errorType = mError.group(1);
           errorText = mError.group(2);
         } else {
@@ -217,7 +226,8 @@ public class JythonScriptRunner implements IScriptRunner {
         errorClass = findErrorSourceWalkTrace(mFile, filename);
         if (errorTrace.length() > 0) {
           Debug.error("--- Traceback --- error source first\n"
-                  + "line: module ( function ) statement \n" + errorTrace);
+                  + "line: module ( function ) statement \n" + errorTrace
+                  + "[error] --- Traceback --- end --------------");
         }
       }
     } else if (errorClass == PY_JAVA) {
@@ -259,7 +269,7 @@ public class JythonScriptRunner implements IScriptRunner {
       trace.insert(0, telem);
 //        Debug.log(2,"Rest of Trace ----\n" + etext.substring(mFile.end()));
     }
-    Debug.log(2, "------------- Traceback -------------\n" + trace);
+    Debug.log(4, "------------- Traceback -------------\n" + trace);
     errorTrace = trace.toString();
     return errorClass;
   }
@@ -466,6 +476,11 @@ public class JythonScriptRunner implements IScriptRunner {
    * @param syspaths List of all syspath entries
    */
   private void executeScriptHeader(String[] syspaths) {
+    Debug.log(2, "%s: at entry: path:", me);
+    for (Object p : interpreter.getSystemState().path.toArray()) {
+      Debug.log(2, p.toString());
+    }
+    Debug.log(2, "%s: at entry: --- end ---", me);
     for (String line : SCRIPT_HEADER) {
       Debug.log(5, "PyInit: %s", line);
       interpreter.exec(line);
