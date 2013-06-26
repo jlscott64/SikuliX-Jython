@@ -16,7 +16,7 @@ def _stripPackagePrefix(module_name):
     return module_name
   
 def _debug():
-  if Debug.getgetDebugLevel > 3:
+  if Debug.getDebugLevel() > 3:
     return True
   else:
     return False;
