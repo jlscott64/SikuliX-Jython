@@ -28,11 +28,21 @@ import org.sikuli.script.IScriptRunner;
  */
 public class JythonScriptRunner implements IScriptRunner {
 
+  //<editor-fold defaultstate="collapsed" desc="new logging concept">
   private static final String me = "JythonScriptRunner";
+  private String mem = "...";
+  private int lvl = 2;
+  private void log(int level, String message, Object... args) {
+    Debug.logx(level, level < 0 ? "error" : "debug",
+            me + ": " + mem + ": " + message, args);
+  }
+  //</editor-fold>
+  
   /**
    * The PythonInterpreter instance
    */
   private static PythonInterpreter interpreter = null;
+  private static int savedpathlen = 0;
   /**
    * sys.argv for the jython script
    */
@@ -84,15 +94,16 @@ public class JythonScriptRunner implements IScriptRunner {
    */
   @Override
   public void init(String[] param) {
+    mem = "init";
     //HACK: to let it work with python.path empty
     if (System.getProperty("python.path") == null) {
       CodeSource src = JythonScriptRunner.class.getProtectionDomain().getCodeSource();
       if (src.getLocation() != null) {
-        Debug.log(2, "%s: init: python.path hack: %s", me, src.getLocation().getPath());
+        log(lvl, "python.path hack: %s", src.getLocation().getPath());
         String pyLib = new File(src.getLocation().getPath(), "Lib").getAbsolutePath();
         System.setProperty("python.path", pyLib);
       } else {
-        Debug.error("%s: init: python.path == null: Sikuli might not work", me);
+        log(-1,"python.path == null: Sikuli might not work");
       }
     }
   }
@@ -107,6 +118,7 @@ public class JythonScriptRunner implements IScriptRunner {
    */
   @Override
   public int runScript(File pyFile, File imagePath, String[] argv, String[] forIDE) {
+    mem = "runScript";
 //TODO not useable this way from IDE on rerun
     fillSysArgv(pyFile, argv);
     createPythonInterpreter();
@@ -114,10 +126,14 @@ public class JythonScriptRunner implements IScriptRunner {
       if (imagePath != null) {
         execBefore(new String[] {"resetImagePath(\"" + imagePath.getAbsolutePath() + "\")"});
       }
-      executeScriptHeader(new String[]{
-        pyFile.getParentFile().getAbsolutePath(),
-        pyFile.getParentFile().getParentFile().getAbsolutePath(),
-      });
+      if (forIDE == null) {
+        executeScriptHeader(new String[]{
+          pyFile.getParentFile().getAbsolutePath(),
+          pyFile.getParentFile().getParentFile().getAbsolutePath()});
+      } else {
+        executeScriptHeader(new String[]{
+          forIDE[0]});
+      }
     } catch (Exception e) {
     }
     int exitCode = 0;
@@ -131,7 +147,7 @@ public class JythonScriptRunner implements IScriptRunner {
       if (matcher.find()) {
         Debug.info("Exit code: " + matcher.group(1));
       } else {
-        //Debug.error(_I("msgStopped"));
+        //log(-1,_I("msgStopped"));
         exitCode = findErrorSource(e, pyFile.getAbsolutePath(), forIDE);
         if (forIDE != null) {
           exitCode *= -1;
@@ -140,17 +156,18 @@ public class JythonScriptRunner implements IScriptRunner {
         }
       }
     }
-    Debug.log(2, "%s: at exit: path:", me);
+    log(lvl+1, "at exit: path:");
     for (Object p : interpreter.getSystemState().path.toArray()) {
-      Debug.log(2, p.toString());
+      log(lvl+1, p.toString());
     }
-    Debug.log(2, "%s: at exit: --- end ---", me);
+    log(lvl+1, "at exit: --- end ---");
     return exitCode;
   }
 
   private int findErrorSource(Throwable thr, String filename, String[] forIDE) {
+    mem = "findErrorSource";
     String err = thr.toString();
-//      Debug.error("------------- Traceback -------------\n" + err +
+//      log(-1,"------------- Traceback -------------\n" + err +
 //              "------------- Traceback -------------\n");
     errorLine = -1;
     errorColumn = -1;
@@ -165,15 +182,15 @@ public class JythonScriptRunner implements IScriptRunner {
       Pattern pError = Pattern.compile(NL + "(.*?):.(.*)$");
       mFile = pFile.matcher(err);
       if (mFile.find()) {
-        Debug.log(4, "Runtime error line: " + mFile.group(2)
+        log(lvl+2, "Runtime error line: " + mFile.group(2)
                 + "\n in function: " + mFile.group(3)
                 + "\n statement: " + mFile.group(4));
         errorLine = Integer.parseInt(mFile.group(2));
         errorClass = PY_RUNTIME;
         Matcher mError = pError.matcher(err);
         if (mError.find()) {
-          Debug.log(4, "Error:" + mError.group(1));
-          Debug.log(4, "Error:" + mError.group(2));
+          log(lvl+2, "Error:" + mError.group(1));
+          log(lvl+2, "Error:" + mError.group(2));
           errorType = mError.group(1);
           errorText = mError.group(2);
         } else {
@@ -192,12 +209,12 @@ public class JythonScriptRunner implements IScriptRunner {
       Pattern pLineS = Pattern.compile(", (\\d+), (\\d+),");
       java.util.regex.Matcher mLine = pLineS.matcher(err);
       if (mLine.find()) {
-        Debug.log(4, "SyntaxError error line: " + mLine.group(1));
+        log(lvl+2, "SyntaxError error line: " + mLine.group(1));
         Pattern pText = Pattern.compile("\\((.*?)\\(");
         java.util.regex.Matcher mText = pText.matcher(err);
         mText.find();
         errorText = mText.group(1) == null ? errorText : mText.group(1);
-        Debug.log(4, "SyntaxError: " + errorText);
+        log(lvl+2, "SyntaxError: " + errorText);
         errorLine = Integer.parseInt(mLine.group(1));
         errorColumn = Integer.parseInt(mLine.group(2));
         errorClass = PY_SYNTAX;
@@ -207,10 +224,10 @@ public class JythonScriptRunner implements IScriptRunner {
 
     msg = "script";
     if (forIDE != null) {
-      msg += " [ " + forIDE[0] + " ]";
+      msg += " [ " + forIDE[1] + " ]";
     }
     if (errorLine != -1) {
-      //Debug.error(_I("msgErrorLine", srcLine));
+      //log(-1,_I("msgErrorLine", srcLine));
       msg += " stopped with error in line " + errorLine;
       if (errorColumn != -1) {
         msg += " at column " + errorColumn;
@@ -220,26 +237,27 @@ public class JythonScriptRunner implements IScriptRunner {
     }
 
     if (errorClass == PY_RUNTIME || errorClass == PY_SYNTAX) {
-      Debug.error(msg);
-      Debug.error(errorType + " ( " + errorText + " )");
+      log(-1,msg);
+      log(-1,errorType + " ( " + errorText + " )");
       if (errorClass == PY_RUNTIME) {
         errorClass = findErrorSourceWalkTrace(mFile, filename);
         if (errorTrace.length() > 0) {
-          Debug.error("--- Traceback --- error source first\n"
+          log(-1,"--- Traceback --- error source first\n"
                   + "line: module ( function ) statement \n" + errorTrace
                   + "[error] --- Traceback --- end --------------");
         }
       }
     } else if (errorClass == PY_JAVA) {
     } else {
-      Debug.error(msg);
-      Debug.error("Could not evaluate error source nor reason. Analyze StackTrace!");
-      Debug.error(err);
+      log(-1,msg);
+      log(-1,"Could not evaluate error source nor reason. Analyze StackTrace!");
+      log(-1,err);
     }
     return errorLine;
   }
 
   private int findErrorSourceWalkTrace(Matcher m, String filename) {
+    mem = "findErrorSourceWalkTrace";
 //[error] Traceback (most recent call last):
 //File "/var/folders/wk/pcty7jkx1r5bzc5dvs6n5x_40000gn/T/sikuli-tmp3464751893408897244.py", line 2, in
 //sub.hello()
@@ -265,37 +283,39 @@ public class JythonScriptRunner implements IScriptRunner {
       }
       telem = m.group(2) + ": " + mod + " ( "
               + m.group(3) + " ) " + m.group(4) + NL;
-      //Debug.log(2,telem);
+      //log(lvl,telem);
       trace.insert(0, telem);
-//        Debug.log(2,"Rest of Trace ----\n" + etext.substring(mFile.end()));
+//        log(lvl,"Rest of Trace ----\n" + etext.substring(mFile.end()));
     }
-    Debug.log(4, "------------- Traceback -------------\n" + trace);
+    log(lvl+2, "------------- Traceback -------------\n" + trace);
     errorTrace = trace.toString();
     return errorClass;
   }
 
   private void findErrorSourceFromJavaStackTrace(Throwable thr, String filename) {
-    Debug.error("seems to be an error in the Java API supporting code");
+    mem = "findErrorSourceFromJavaStackTrace";
+    log(-1,"seems to be an error in the Java API supporting code");
     StackTraceElement[] s;
     Throwable t = thr;
     while (t != null) {
       s = t.getStackTrace();
-      Debug.log(2, "stack trace:");
+      log(lvl+2, "stack trace:");
       for (int i = s.length - 1; i >= 0; i--) {
         StackTraceElement si = s[i];
-        Debug.log(2, si.getLineNumber() + " " + si.getFileName());
+        log(lvl+2, si.getLineNumber() + " " + si.getFileName());
         if (si.getLineNumber() >= 0 && filename.equals(si.getFileName())) {
           errorLine = si.getLineNumber();
         }
       }
       t = t.getCause();
-      Debug.log(2, "cause: " + t);
+      log(lvl+2, "cause: " + t);
     }
   }
 
   @Override
   public int runTest(File scriptfile, File imagepath, String[] argv, String[] forIDE) {
-    Debug.error("Sikuli Test Feature is not implemented at the moment");
+    mem = "runTest";
+    log(-1,"Sikuli Test Feature is not implemented at the moment");
     return -1;
   }
 
@@ -304,6 +324,7 @@ public class JythonScriptRunner implements IScriptRunner {
    */
   @Override
   public int runInteractive(String[] argv) {
+    mem = "runInteractive";
 
     fillSysArgv(null, argv);
 
@@ -435,11 +456,15 @@ public class JythonScriptRunner implements IScriptRunner {
     } else if ("cleanBundle".equals(action)) {
       cleanBundle((String) args[0]);
       return true;
+    } else if ("createRegionForWith".equals(action)) {
+      args[0] = createRegionForWith(args[0]);
+      return true;
     } else {
       return false;
     }
   }
 
+//TODO revise the before/after concept (to support IDE reruns)
   /**
    * {@inheritDoc}
    */
@@ -476,13 +501,21 @@ public class JythonScriptRunner implements IScriptRunner {
    * @param syspaths List of all syspath entries
    */
   private void executeScriptHeader(String[] syspaths) {
-    Debug.log(2, "%s: at entry: path:", me);
-    for (Object p : interpreter.getSystemState().path.toArray()) {
-      Debug.log(2, p.toString());
+    mem = "executeScriptHeader";
+    if (savedpathlen == 0) {
+      savedpathlen = interpreter.getSystemState().path.size();
+      log(lvl+1, "saved sys.path: %d", savedpathlen);
+    } else if (interpreter.getSystemState().path.size() > savedpathlen) { 
+      interpreter.getSystemState().path.remove(savedpathlen, 
+                      interpreter.getSystemState().path.size());
     }
-    Debug.log(2, "%s: at entry: --- end ---", me);
+    log(lvl+1, "at entry: path:");
+    for (Object p : interpreter.getSystemState().path.toArray()) {
+      log(lvl+1, p.toString());
+    }
+    log(lvl+1, "at entry: --- end ---");
     for (String line : SCRIPT_HEADER) {
-      Debug.log(5, "PyInit: %s", line);
+      log(lvl+1, "PyInit: %s", line);
       interpreter.exec(line);
     }
     for (String syspath : syspaths) {
@@ -496,6 +529,7 @@ public class JythonScriptRunner implements IScriptRunner {
   }
 
   private boolean doRedirect(PipedInputStream[] pin) {
+    mem = "doRedirect";
     PythonInterpreter py = getPythonInterpreter();
     try {
       PipedOutputStream pout = new PipedOutputStream(pin[0]);
@@ -503,7 +537,7 @@ public class JythonScriptRunner implements IScriptRunner {
       System.setOut(ps);
       py.setOut(ps);
     } catch (Exception e) {
-      Debug.log(2, "%s: doRedirect: Couldn't redirect STDOUT\n%s", me, e.getMessage());
+      log(-1, "Couldn't redirect STDOUT\n%s", e.getMessage());
       return false;
     }
     try {
@@ -512,24 +546,30 @@ public class JythonScriptRunner implements IScriptRunner {
       System.setErr(ps);
       py.setErr(ps);
     } catch (Exception e) {
-      Debug.log(2, "%s: doRedirect: Couldn't redirect STDERR\n%s", me, e.getMessage());
+      log(-1, "Couldn't redirect STDERR\n%s", e.getMessage());
       return false;
     }
     return true;
   }
 
   private void convertSrcToHtml(String bundle) {
+    mem = "";
     PythonInterpreter py = new PythonInterpreter();
-    Debug.log(2, "Convert Sikuli source code " + bundle + " to HTML");
+    log(lvl, "Convert Sikuli source code " + bundle + " to HTML");
     py.set("local_convert", true);
     py.set("sikuli_src", bundle);
     py.exec(pyConverter);
   }
 
   private void cleanBundle(String bundle) {
+    mem = "";
     PythonInterpreter py = new PythonInterpreter();
-    Debug.log(2, "Clear source bundle " + bundle);
+    log(lvl, "Clear source bundle " + bundle);
     py.set("bundle_path", bundle);
     py.exec(pyBundleCleaner);
+  }
+  
+  private Object createRegionForWith(Object reg) {
+    return null;
   }
 }
