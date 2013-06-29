@@ -21,3 +21,5 @@
 
 nb-configuration.xml
 nbactions.xml
+
+._*
