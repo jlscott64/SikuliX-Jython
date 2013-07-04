@@ -16,12 +16,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.cli.CommandLine;
 import org.python.util.PythonInterpreter;
 import org.python.util.jython;
-import org.sikuli.script.Debug;
-import org.sikuli.script.FileManager;
-import org.sikuli.script.IScriptRunner;
+import org.sikuli.setup.Debug;
+import org.sikuli.setup.FileManager;
+import org.sikuli.setup.IScriptRunner;
 
 /**
  * Executes Sikuliscripts written in Python/Jython.
@@ -64,7 +63,6 @@ public class JythonScriptRunner implements IScriptRunner {
   /**
    * CommandLine args
    */
-  CommandLine cmdLine = null;
   private int errorLine;
   private int errorColumn;
   private String errorType;
@@ -237,21 +235,21 @@ public class JythonScriptRunner implements IScriptRunner {
     }
 
     if (errorClass == PY_RUNTIME || errorClass == PY_SYNTAX) {
-      log(-1,msg);
-      log(-1,errorType + " ( " + errorText + " )");
+      Debug.error(msg);
+      Debug.error(errorType + " ( " + errorText + " )");
       if (errorClass == PY_RUNTIME) {
         errorClass = findErrorSourceWalkTrace(mFile, filename);
         if (errorTrace.length() > 0) {
-          log(-1,"--- Traceback --- error source first\n"
+          Debug.error("--- Traceback --- error source first\n"
                   + "line: module ( function ) statement \n" + errorTrace
                   + "[error] --- Traceback --- end --------------");
         }
       }
     } else if (errorClass == PY_JAVA) {
     } else {
-      log(-1,msg);
-      log(-1,"Could not evaluate error source nor reason. Analyze StackTrace!");
-      log(-1,err);
+      Debug.error(msg);
+      Debug.error("Could not evaluate error source nor reason. Analyze StackTrace!");
+      Debug.error(err);
     }
     return errorLine;
   }

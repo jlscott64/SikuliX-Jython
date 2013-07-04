@@ -24,7 +24,7 @@ from org.sikuli.script import SikuliEvent
 from org.sikuli.script import ScreenUnion
 from org.sikuli.script import Finder
 from org.sikuli.script import Location
-from org.sikuli.script import Settings
+from org.sikuli.setup import Settings
 from org.sikuli.script import OS
 from org.sikuli.script import App
 from org.sikuli.script import ScreenHighlighter
@@ -34,7 +34,7 @@ from org.sikuli.script import KeyModifier
 from org.sikuli.script.KeyModifier import KEY_CTRL, KEY_SHIFT, KEY_META, KEY_CMD, KEY_WIN, KEY_ALT
 from org.sikuli.script import Button
 from org.sikuli.script import ExtensionManager
-from org.sikuli.script import Debug
+from org.sikuli.setup import Debug
 from java.awt import Rectangle
 # RaiMan not used from VDict import *
 from Helper import *

@@ -5,7 +5,7 @@ import imp
 import sys
 
 import Sikuli
-from org.sikuli.script import Debug
+from org.sikuli.setup import Debug
 from org.sikuli.script import ImageLocator
 import os
 
