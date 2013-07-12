@@ -18,9 +18,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.python.util.PythonInterpreter;
 import org.python.util.jython;
-import org.sikuli.setup.Debug;
-import org.sikuli.setup.FileManager;
-import org.sikuli.setup.IScriptRunner;
+import org.sikuli.basics.Debug;
+import org.sikuli.basics.FileManager;
+import org.sikuli.basics.IScriptRunner;
 
 /**
  * Executes Sikuliscripts written in Python/Jython.
@@ -95,7 +95,7 @@ public class JythonScriptRunner implements IScriptRunner {
     mem = "init";
     //HACK: to let it work with python.path empty
     if (System.getProperty("python.path") == null) {
-      CodeSource src = this.getClass().getProtectionDomain().getCodeSource();
+      CodeSource src = FileManager.class.getProtectionDomain().getCodeSource();
       if (src.getLocation() != null) {
         String pyLib = FileManager.slashify(src.getLocation().getPath(), true) + "Lib";
         System.setProperty("python.path", pyLib);
