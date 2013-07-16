@@ -28,7 +28,7 @@ import org.sikuli.basics.IScriptRunner;
 public class JythonScriptRunner implements IScriptRunner {
 
   //<editor-fold defaultstate="collapsed" desc="new logging concept">
-  private static final String me = "JythonScriptRunner";
+  private static final String me = "JythonScriptRunner: ";
   private String mem = "...";
   private int lvl = 2;
   private void log(int level, String message, Object... args) {
