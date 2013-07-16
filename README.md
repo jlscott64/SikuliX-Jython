@@ -5,6 +5,7 @@ This is **fully Maven**, so a fork of this repo can be directly used as project 
 or with mvn on commandline. 
 
 Forking only makes sense, if you want to contribute new features or patches.
+<br />Use *mvn install* in the project folder to get it in your local repo.
 
 It implements the **IScriptRunner** interface (internally used by SikuliX), to allow to run scripts written in Python language. 
 
