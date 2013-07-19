@@ -117,7 +117,13 @@ public class JythonScriptRunner implements IScriptRunner {
   @Override
   public int runScript(File pyFile, File imagePath, String[] argv, String[] forIDE) {
     mem = "runScript";
-//TODO not useable this way from IDE on rerun
+    if (null == pyFile) {
+      //run the Python statements from argv (special for setup fgunctional test)
+      fillSysArgv(null, null);
+      createPythonInterpreter();        
+      executeScriptHeader(new String[0]);
+      return runPython(null, argv, null);
+    }
     fillSysArgv(pyFile, argv);
     createPythonInterpreter();
     try {
@@ -135,8 +141,28 @@ public class JythonScriptRunner implements IScriptRunner {
     } catch (Exception e) {
     }
     int exitCode = 0;
+    exitCode = runPython(pyFile, null, forIDE);
+    log(lvl+1, "at exit: path:");
+    for (Object p : interpreter.getSystemState().path.toArray()) {
+      log(lvl+1, p.toString());
+    }
+    log(lvl+1, "at exit: --- end ---");
+    return exitCode;
+  }
+  
+  private int runPython(File pyFile, String[] stmts, String[] forIDE) {
+    int exitCode = 0;
+    String stmt = "";
     try {
-      interpreter.execfile(pyFile.getAbsolutePath());
+      if (null == pyFile) {
+        for (String e : stmts) {
+          stmt = e;
+          interpreter.exec(stmt);
+        }
+
+      } else {
+        interpreter.execfile(pyFile.getAbsolutePath());
+      }
     } catch (Exception e) {
       java.util.regex.Pattern p =
               java.util.regex.Pattern.compile("SystemExit: ([0-9]+)");
@@ -146,7 +172,11 @@ public class JythonScriptRunner implements IScriptRunner {
         Debug.info("Exit code: " + matcher.group(1));
       } else {
         //log(-1,_I("msgStopped"));
-        exitCode = findErrorSource(e, pyFile.getAbsolutePath(), forIDE);
+        if (null != pyFile) {
+          exitCode = findErrorSource(e, pyFile.getAbsolutePath(), forIDE);
+        } else {
+          Debug.error("runPython: Python exception: %s with %s", e.getMessage(), stmt);
+        }
         if (forIDE != null) {
           exitCode *= -1;
         } else {
@@ -154,11 +184,6 @@ public class JythonScriptRunner implements IScriptRunner {
         }
       }
     }
-    log(lvl+1, "at exit: path:");
-    for (Object p : interpreter.getSystemState().path.toArray()) {
-      log(lvl+1, p.toString());
-    }
-    log(lvl+1, "at exit: --- end ---");
     return exitCode;
   }
 
