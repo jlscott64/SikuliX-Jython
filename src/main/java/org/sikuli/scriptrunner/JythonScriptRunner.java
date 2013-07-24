@@ -21,6 +21,7 @@ import org.python.util.jython;
 import org.sikuli.basics.Debug;
 import org.sikuli.basics.FileManager;
 import org.sikuli.basics.IScriptRunner;
+import org.sikuli.basics.SikuliX;
 
 /**
  * Executes Sikuliscripts written in Python/Jython.
@@ -141,6 +142,8 @@ public class JythonScriptRunner implements IScriptRunner {
     } catch (Exception e) {
     }
     int exitCode = 0;
+    SikuliX.displaySplash(null);
+    SikuliX.displaySplashFirstTime(null);
     exitCode = runPython(pyFile, null, forIDE);
     log(lvl+1, "at exit: path:");
     for (Object p : interpreter.getSystemState().path.toArray()) {
