@@ -142,8 +142,8 @@ public class JythonScriptRunner implements IScriptRunner {
     } catch (Exception e) {
     }
     int exitCode = 0;
-    SikuliX.displaySplash(null);
     SikuliX.displaySplashFirstTime(null);
+    SikuliX.displaySplash(null);
     exitCode = runPython(pyFile, null, forIDE);
     log(lvl+1, "at exit: path:");
     for (Object p : interpreter.getSystemState().path.toArray()) {
