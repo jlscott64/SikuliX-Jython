@@ -21,6 +21,7 @@ import org.python.util.jython;
 import org.sikuli.basics.Debug;
 import org.sikuli.basics.FileManager;
 import org.sikuli.basics.IScriptRunner;
+import org.sikuli.basics.Settings;
 import org.sikuli.basics.SikuliX;
 
 /**
@@ -164,6 +165,10 @@ public class JythonScriptRunner implements IScriptRunner {
         }
 
       } else {
+        if (forIDE != null) {
+          interpreter.exec("sys.argv[0] = \"" + 
+                  FileManager.slashify(forIDE[0], true) + forIDE[1] + "\"" );
+        }
         interpreter.execfile(pyFile.getAbsolutePath());
       }
     } catch (Exception e) {
@@ -458,7 +463,7 @@ public class JythonScriptRunner implements IScriptRunner {
    */
   private void createPythonInterpreter() {
     if (interpreter == null) {
-      PythonInterpreter.initialize(System.getProperties(), null, sysargv.toArray(new String[sysargv.size()]));
+      PythonInterpreter.initialize(System.getProperties(), null, sysargv.toArray(new String[0]));
       interpreter = new PythonInterpreter();
     }
   }
@@ -466,6 +471,8 @@ public class JythonScriptRunner implements IScriptRunner {
   public PythonInterpreter getPythonInterpreter() {
     if (interpreter == null) {
       sysargv = new ArrayList<String>();
+      sysargv.add("--???--");
+      sysargv.addAll(Arrays.asList(Settings.getArgs()));
       createPythonInterpreter();
     }
     return interpreter;
