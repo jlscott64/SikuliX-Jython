@@ -124,23 +124,22 @@ public class JythonScriptRunner implements IScriptRunner {
       fillSysArgv(null, null);
       createPythonInterpreter();        
       executeScriptHeader(new String[0]);
+      SikuliX.displaySplash(null);
       return runPython(null, argv, null);
     }
+    pyFile = new File(pyFile.getAbsolutePath());
     fillSysArgv(pyFile, argv);
     createPythonInterpreter();
-    try {
-      if (imagePath != null) {
-        execBefore(new String[] {"resetImagePath(\"" + imagePath.getAbsolutePath() + "\")"});
-      }
-      if (forIDE == null) {
-        executeScriptHeader(new String[]{
-          pyFile.getParentFile().getAbsolutePath(),
-          pyFile.getParentFile().getParentFile().getAbsolutePath()});
-      } else {
-        executeScriptHeader(new String[]{
-          forIDE[0]});
-      }
-    } catch (Exception e) {
+    if (imagePath != null) {
+      execBefore(new String[] {"resetImagePath(\"" + imagePath.getAbsolutePath() + "\")"});
+    }
+    if (forIDE == null) {
+      executeScriptHeader(new String[]{
+        pyFile.getParentFile().getAbsolutePath(),
+        pyFile.getParentFile().getParentFile().getAbsolutePath()});
+    } else {
+      executeScriptHeader(new String[]{
+        forIDE[0]});
     }
     int exitCode = 0;
     SikuliX.displaySplashFirstTime(null);
@@ -361,7 +360,7 @@ public class JythonScriptRunner implements IScriptRunner {
 
     String[] jy_args = null;
     String[] iargs = {"-i", "-c",
-      "from sikuli import *; SikuliScript.runningInteractive = True; "
+      "from sikuli import *; SikuliScript.runningInteractive(); "
       + "print \"Hello, this is your interactive Sikuli (rules for interactive Python apply)\\n"
       + "use the UP/DOWN arrow keys to walk through the input history\\n"
       + "help()<enter> will output some basic Python information\\n"
@@ -374,7 +373,6 @@ public class JythonScriptRunner implements IScriptRunner {
     } else {
       jy_args = iargs;
     }
-
     jython.main(jy_args);
     return 0;
   }
