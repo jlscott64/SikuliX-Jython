@@ -460,6 +460,7 @@ public class JythonScriptRunner implements IScriptRunner {
    * Initializes the PythonInterpreter and creates an instance.
    */
   private void createPythonInterpreter() {
+//TODO create a specific PythonPath (sys.path)
     if (interpreter == null) {
       PythonInterpreter.initialize(System.getProperties(), null, sysargv.toArray(new String[0]));
       interpreter = new PythonInterpreter();
