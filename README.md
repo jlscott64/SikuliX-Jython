@@ -11,5 +11,5 @@ It implements the **IScriptRunner** interface (internally used by SikuliX), to a
 
 It depends on [Sikuli Basics](https://github.com/RaiMan/SikuliX-Basics) and is **currently not intended for usages outside the downloadable Sikuli packages** (sikuli-script.jar and sikuli-ide.jar).
 
-To support Jython developement in IDEs we have the **sikulix-java.jar** from the package [Sikuli API](https://github.com/RaiMan/SikuliX-API).
+To support Jython developement in IDEs we have the **sikuli-java.jar** from the package [Sikuli API](https://github.com/RaiMan/SikuliX-API).
 
