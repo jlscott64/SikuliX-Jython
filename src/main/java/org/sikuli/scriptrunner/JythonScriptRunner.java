@@ -39,6 +39,8 @@ public class JythonScriptRunner implements IScriptRunner {
   }
   //</editor-fold>
   
+  private static String timestampBuilt;
+  private static final String tsb = "##--##Do 15 Aug 2013 14:27:41 CEST##--##"; 
   /**
    * The PythonInterpreter instance
    */
@@ -94,7 +96,12 @@ public class JythonScriptRunner implements IScriptRunner {
    */
   @Override
   public void init(String[] param) {
+    timestampBuilt = tsb.substring(6, tsb.length()-6);
+    timestampBuilt = timestampBuilt.substring(
+                     timestampBuilt.indexOf(" ")+1, timestampBuilt.lastIndexOf(" "));
+    timestampBuilt = timestampBuilt.replaceAll(" ", "").replaceAll(":", "").toUpperCase();
     mem = "init";
+    log(lvl, "SikuliX Jython Support Build: %s %s", Settings.getVersionShort(), timestampBuilt);
     //HACK: to let it work with python.path empty
     if (System.getProperty("python.path") == null) {
       CodeSource src = FileManager.class.getProtectionDomain().getCodeSource();
