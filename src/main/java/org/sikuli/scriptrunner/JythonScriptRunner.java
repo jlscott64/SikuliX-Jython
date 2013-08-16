@@ -16,11 +16,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.python.core.PyList;
 import org.python.util.PythonInterpreter;
 import org.python.util.jython;
 import org.sikuli.basics.Debug;
 import org.sikuli.basics.FileManager;
 import org.sikuli.basics.IScriptRunner;
+import org.sikuli.basics.ImageLocator;
 import org.sikuli.basics.Settings;
 import org.sikuli.basics.SikuliX;
 
@@ -91,17 +93,20 @@ public class JythonScriptRunner implements IScriptRunner {
   static String pyBundleCleaner =
           FileManager.convertStreamToString(SikuliBundleCleaner);
 
+  static {
+    timestampBuilt = tsb.substring(6, tsb.length()-6);
+    timestampBuilt = timestampBuilt.substring(
+                     timestampBuilt.indexOf(" ")+1, timestampBuilt.lastIndexOf(" "));
+    timestampBuilt = timestampBuilt.replaceAll(" ", "").replaceAll(":", "").toUpperCase();
+    Debug.log(3, "SikuliX Jython Support Build: %s %s", Settings.getVersionShort(), timestampBuilt);
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
   public void init(String[] param) {
-    timestampBuilt = tsb.substring(6, tsb.length()-6);
-    timestampBuilt = timestampBuilt.substring(
-                     timestampBuilt.indexOf(" ")+1, timestampBuilt.lastIndexOf(" "));
-    timestampBuilt = timestampBuilt.replaceAll(" ", "").replaceAll(":", "").toUpperCase();
     mem = "init";
-    log(lvl, "SikuliX Jython Support Build: %s %s", Settings.getVersionShort(), timestampBuilt);
     //HACK: to let it work with python.path empty
     if (System.getProperty("python.path") == null) {
       CodeSource src = FileManager.class.getProtectionDomain().getCodeSource();
@@ -138,7 +143,7 @@ public class JythonScriptRunner implements IScriptRunner {
     fillSysArgv(pyFile, argv);
     createPythonInterpreter();
     if (imagePath != null) {
-      execBefore(new String[] {"resetImagePath(\"" + imagePath.getAbsolutePath() + "\")"});
+      ImageLocator.resetImagePath(imagePath.getAbsolutePath());
     }
     if (forIDE == null) {
       executeScriptHeader(new String[]{
@@ -553,12 +558,13 @@ public class JythonScriptRunner implements IScriptRunner {
       log(lvl+1, p.toString());
     }
     log(lvl+1, "at entry: --- end ---");
+    PyList jypath = interpreter.getSystemState().path;
+    for (String syspath : syspaths) {
+      jypath.add(FileManager.slashify(syspath, false));
+    }
     for (String line : SCRIPT_HEADER) {
       log(lvl+1, "PyInit: %s", line);
       interpreter.exec(line);
-    }
-    for (String syspath : syspaths) {
-      interpreter.exec("addModPath(\"" + syspath + "\")");
     }
     if (codeBefore != null) {
       for (String line : codeBefore) {
