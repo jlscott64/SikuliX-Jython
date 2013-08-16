@@ -42,7 +42,7 @@ public class JythonScriptRunner implements IScriptRunner {
   //</editor-fold>
   
   private static String timestampBuilt;
-  private static final String tsb = "##--##Do 15 Aug 2013 14:27:41 CEST##--##"; 
+  private static final String tsb = "##--##Fr 16 Aug 2013 14:51:29 CEST##--##"; 
   /**
    * The PythonInterpreter instance
    */
@@ -107,7 +107,7 @@ public class JythonScriptRunner implements IScriptRunner {
   @Override
   public void init(String[] param) {
     mem = "init";
-    //HACK: to let it work with python.path empty
+/*    //HACK: to let it work with python.path empty
     if (System.getProperty("python.path") == null) {
       CodeSource src = FileManager.class.getProtectionDomain().getCodeSource();
       if (src.getLocation() != null) {
@@ -118,6 +118,7 @@ public class JythonScriptRunner implements IScriptRunner {
         log(-1,"python.path == null: Sikuli might not work");
       }
     }
+    */
   }
 
   /**
