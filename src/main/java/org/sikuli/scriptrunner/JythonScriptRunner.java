@@ -42,7 +42,7 @@ public class JythonScriptRunner implements IScriptRunner {
   //</editor-fold>
   
   private static String timestampBuilt;
-  private static final String tsb = "##--##Fr 16 Aug 2013 15:21:17 CEST##--##"; 
+  private static final String tsb = "##--##Sa 17 Aug 2013 12:02:08 CEST##--##"; 
   /**
    * The PythonInterpreter instance
    */
@@ -92,6 +92,7 @@ public class JythonScriptRunner implements IScriptRunner {
           JythonScriptRunner.class.getResourceAsStream("/scripts/clean-dot-sikuli.py");
   static String pyBundleCleaner =
           FileManager.convertStreamToString(SikuliBundleCleaner);
+  private static String sikuliLibPath;
 
   static {
     timestampBuilt = tsb.substring(6, tsb.length()-6);
@@ -107,18 +108,16 @@ public class JythonScriptRunner implements IScriptRunner {
   @Override
   public void init(String[] param) {
     mem = "init";
-/*    //HACK: to let it work with python.path empty
-    if (System.getProperty("python.path") == null) {
-      CodeSource src = FileManager.class.getProtectionDomain().getCodeSource();
-      if (src.getLocation() != null) {
-        String pyLib = FileManager.slashify(src.getLocation().getPath(), true) + "Lib";
-        System.setProperty("python.path", pyLib);
-        log(lvl, "python.path hack: %s", pyLib);
+    sikuliLibPath = new File(SikuliX.getJarPath(), "Lib").getAbsolutePath();
+    if (!SikuliX.isRunningFromJar()) {
+      if (System.getProperty("python.path") == null) {
+        System.setProperty("python.path", sikuliLibPath);
+        log(lvl, "python.path hack: " + System.getProperty("python.path"));
       } else {
-        log(-1,"python.path == null: Sikuli might not work");
+        log(-1, "Not running from jar and Python path not empty: Sikuli might not work!\n" +
+                "Current python.path: " + System.getProperty("python.path"));
       }
     }
-    */
   }
 
   /**
@@ -166,6 +165,8 @@ public class JythonScriptRunner implements IScriptRunner {
     return exitCode;
   }
   
+  
+
   private int runPython(File pyFile, String[] stmts, String[] forIDE) {
     int exitCode = 0;
     String stmt = "";
@@ -547,6 +548,24 @@ public class JythonScriptRunner implements IScriptRunner {
    */
   private void executeScriptHeader(String[] syspaths) {
     mem = "executeScriptHeader";
+    PyList jypath = interpreter.getSystemState().path;
+    if (!FileManager.pathEquals((String) jypath.get(0), sikuliLibPath, true)) {
+      log(lvl, "adding SikuliX Lib path to sys.path\n" + sikuliLibPath);
+      int jypathLength = jypath.__len__();
+      String[] jypathNew = new String[jypathLength+1];
+      jypathNew[0] = sikuliLibPath;
+      for (int i = 0; i < jypathLength; i++) {
+        log(lvl+1, "before: %d: %s", i, jypath.get(i));
+        jypathNew[i+1] = (String) jypath.get(i);
+      }
+      for (int i = 0; i < jypathLength; i++) {
+        jypath.set(i, jypathNew[i]);
+      }
+      jypath.add(jypathNew[jypathNew.length-1]);
+      for (int i = 0; i < jypathNew.length; i++) {
+        log(lvl+1, "after: %d: %s", i, jypath.get(i));
+      }
+    }
     if (savedpathlen == 0) {
       savedpathlen = interpreter.getSystemState().path.size();
       log(lvl+1, "saved sys.path: %d", savedpathlen);
@@ -559,7 +578,6 @@ public class JythonScriptRunner implements IScriptRunner {
       log(lvl+1, p.toString());
     }
     log(lvl+1, "at entry: --- end ---");
-    PyList jypath = interpreter.getSystemState().path;
     for (String syspath : syspaths) {
       jypath.add(FileManager.slashify(syspath, false));
     }
