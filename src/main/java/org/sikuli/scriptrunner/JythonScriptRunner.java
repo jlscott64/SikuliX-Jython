@@ -42,7 +42,7 @@ public class JythonScriptRunner implements IScriptRunner {
   //</editor-fold>
   
   private static String timestampBuilt;
-  private static final String tsb = "##--##Sa 17 Aug 2013 12:02:08 CEST##--##"; 
+  private static final String tsb = "##--##Mo 19 Aug 2013 13:35:30 CEST##--##"; 
   /**
    * The PythonInterpreter instance
    */
@@ -176,7 +176,6 @@ public class JythonScriptRunner implements IScriptRunner {
           stmt = e;
           interpreter.exec(stmt);
         }
-
       } else {
         if (forIDE != null) {
           interpreter.exec("sys.argv[0] = \"" + 
