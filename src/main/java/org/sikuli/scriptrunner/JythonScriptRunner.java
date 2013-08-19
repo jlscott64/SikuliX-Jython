@@ -114,8 +114,11 @@ public class JythonScriptRunner implements IScriptRunner {
         System.setProperty("python.path", sikuliLibPath);
         log(lvl, "python.path hack: " + System.getProperty("python.path"));
       } else {
-        log(-1, "Not running from jar and Python path not empty: Sikuli might not work!\n" +
-                "Current python.path: " + System.getProperty("python.path"));
+        String currentPath = System.getProperty("python.path");
+        if (!FileManager.pathEquals(currentPath, sikuliLibPath, true)) {
+          log(-1, "Not running from jar and Python path not empty: Sikuli might not work!\n" +
+                  "Current python.path: " + currentPath);
+        }
       }
     }
   }
