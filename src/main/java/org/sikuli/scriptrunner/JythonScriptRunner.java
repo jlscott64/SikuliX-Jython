@@ -34,7 +34,7 @@ public class JythonScriptRunner implements IScriptRunner {
   //<editor-fold defaultstate="collapsed" desc="new logging concept">
   private static final String me = "JythonScriptRunner: ";
   private String mem = "...";
-  private int lvl = 2;
+  private int lvl = 3;
   private void log(int level, String message, Object... args) {
     Debug.logx(level, level < 0 ? "error" : "debug",
             me + ": " + mem + ": " + message, args);
@@ -42,7 +42,7 @@ public class JythonScriptRunner implements IScriptRunner {
   //</editor-fold>
   
   private static String timestampBuilt;
-  private static final String tsb = "##--##Mo  2 Sep 2013 17:27:54 CEST##--##"; 
+  private static final String tsb = "##--##Mi  4 Sep 2013 19:10:05 CEST##--##"; 
   /**
    * The PythonInterpreter instance
    */
