@@ -2,13 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   
-  <!--
-  * Copyright 2010-2013, Sikuli.org
-  * Released under the MIT License.
-  *
-  * kelthuzad, RaiMan 2013
-  -->
-
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.sikuli</groupId>
@@ -38,12 +31,6 @@
       <email>rmhdevelop@me.com</email>
     </developer>
   </developers>
-
-  <scm>
-    <connection>scm:git://github.com/RaiMan/SikuliX-Jython.git</connection>
-    <developerConnection>scm:git://github.com/RaiMan/SikuliX-Jython.git</developerConnection>
-    <url>git://github.com/RaiMan/SikuliX-Jython.git</url>
-  </scm>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
