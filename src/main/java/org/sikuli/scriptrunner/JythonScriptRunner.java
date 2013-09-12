@@ -192,7 +192,8 @@ public class JythonScriptRunner implements IScriptRunner {
       Matcher matcher = p.matcher(e.toString());
 //TODO error stop I18N
       if (matcher.find()) {
-        Debug.info("Exit code: " + matcher.group(1));
+        exitCode = Integer.parseInt(matcher.group(1));
+        Debug.info("Exit code: " + exitCode);
       } else {
         //log(-1,_I("msgStopped"));
         if (null != pyFile) {
