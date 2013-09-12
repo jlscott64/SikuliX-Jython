@@ -42,7 +42,7 @@ public class JythonScriptRunner implements IScriptRunner {
   //</editor-fold>
   
   private static String timestampBuilt;
-  private static final String tsb = "##--##Mi  4 Sep 2013 19:10:05 CEST##--##"; 
+  private static final String tsb = "##--##Do 12 Sep 2013 15:32:15 CEST##--##"; 
   /**
    * The PythonInterpreter instance
    */
@@ -192,7 +192,8 @@ public class JythonScriptRunner implements IScriptRunner {
       Matcher matcher = p.matcher(e.toString());
 //TODO error stop I18N
       if (matcher.find()) {
-        Debug.info("Exit code: " + matcher.group(1));
+        exitCode = Integer.parseInt(matcher.group(1));
+        Debug.info("Exit code: " + exitCode);
       } else {
         //log(-1,_I("msgStopped"));
         if (null != pyFile) {
