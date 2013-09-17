@@ -23,6 +23,7 @@ import org.sikuli.basics.Debug;
 import org.sikuli.basics.FileManager;
 import org.sikuli.basics.IScriptRunner;
 import org.sikuli.basics.ImageLocator;
+import org.sikuli.basics.ImagePath;
 import org.sikuli.basics.Settings;
 import org.sikuli.basics.SikuliX;
 
@@ -146,7 +147,7 @@ public class JythonScriptRunner implements IScriptRunner {
     fillSysArgv(pyFile, argv);
     createPythonInterpreter();
     if (imagePath != null) {
-      ImageLocator.resetImagePath(imagePath.getAbsolutePath());
+      ImagePath.reset(imagePath.getAbsolutePath());
     }
     if (forIDE == null) {
       executeScriptHeader(new String[]{
