@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
-import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -22,8 +21,6 @@ import org.python.util.jython;
 import org.sikuli.basics.Debug;
 import org.sikuli.basics.FileManager;
 import org.sikuli.basics.IScriptRunner;
-import org.sikuli.basics.ImageLocator;
-import org.sikuli.basics.ImagePath;
 import org.sikuli.basics.Settings;
 import org.sikuli.basics.SikuliX;
 
@@ -43,7 +40,7 @@ public class JythonScriptRunner implements IScriptRunner {
   //</editor-fold>
   
   private static String timestampBuilt;
-  private static final String tsb = "##--##Mi 11 Sep 2013 14:43:10 CEST##--##"; 
+  private static final String tsb = "##--##So 20 Okt 2013 18:25:34 CEST##--##"; 
   /**
    * The PythonInterpreter instance
    */
@@ -146,9 +143,6 @@ public class JythonScriptRunner implements IScriptRunner {
     pyFile = new File(pyFile.getAbsolutePath());
     fillSysArgv(pyFile, argv);
     createPythonInterpreter();
-    if (imagePath != null) {
-      ImagePath.reset(imagePath.getAbsolutePath());
-    }
     if (forIDE == null) {
       executeScriptHeader(new String[]{
         pyFile.getParentFile().getAbsolutePath(),
