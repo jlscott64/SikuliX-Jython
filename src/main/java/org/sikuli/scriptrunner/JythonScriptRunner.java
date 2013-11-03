@@ -40,7 +40,7 @@ public class JythonScriptRunner implements IScriptRunner {
   //</editor-fold>
   
   private static String timestampBuilt;
-  private static final String tsb = "##--##So 20 Okt 2013 18:25:34 CEST##--##"; 
+  private static final String tsb = "##--##Sa  2 Nov 2013 14:49:40 CET##--##"; 
   /**
    * The PythonInterpreter instance
    */
@@ -56,6 +56,7 @@ public class JythonScriptRunner implements IScriptRunner {
   private static String[] SCRIPT_HEADER = new String[]{
     "# -*- coding: utf-8 -*- ",
     "import sys",
+    "print '[debug] Running Jython:', sys.version.split('\\n')[0]",
     "from __future__ import with_statement",
     "from sikuli import *",
     "resetROI()",
