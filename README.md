@@ -5,5 +5,5 @@ Sikuli Jython 1.1.0 development
 
 **This branch is now contained in the new repo SiluliX-2014**
 
-**Only here for hitorical reasons to see the commits**
+**Only here for historical reasons to see the commits**
 
